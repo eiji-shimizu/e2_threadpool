@@ -8,13 +8,13 @@ int main()
 {
     try {
         Eihire2::ThreadPool threadPool;
-        Eihire2::WorkThread t1 = threadPool.addWorkThread();
-        t1.start();
-        threadPool.addWorkThread().start();
-        t1.start();
-        t1.start();
-        t1.start();
-        t1.start();
+        Eihire2::Work w1 = threadPool.addWork();
+        w1.start();
+        threadPool.addWork().start();
+        w1.start();
+        w1.start();
+        w1.start();
+        w1.start();
     }
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;

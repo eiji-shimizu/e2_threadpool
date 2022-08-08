@@ -7,15 +7,15 @@ namespace Eihire2 {
 
     class ThreadPool;
 
-    class WorkThread {
+    class Work {
     public:
-        WorkThread(Inner::WorkThreadImpl workThreadImpl);
-        ~WorkThread();
+        Work(Inner::WorkImpl workThreadImpl);
+        ~Work();
 
         void start();
 
     private:
-        Inner::WorkThreadImpl workThreadImpl_;
+        Inner::WorkImpl workImpl_;
     };
 
     class ThreadPool {
@@ -29,7 +29,7 @@ namespace Eihire2 {
         ThreadPool(ThreadPool &&) = delete;
         ThreadPool &operator=(ThreadPool &&) = delete;
 
-        WorkThread addWorkThread();
+        Work addWork();
 
     private:
         Inner::ThreadPoolImpl threadPoolImpl_;

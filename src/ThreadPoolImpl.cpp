@@ -40,17 +40,17 @@ namespace Eihire2::Inner {
     }
 
     /**
-     *  WorkThreadImpl
+     *  WorkImpl
      */
-    WorkThreadImpl::WorkThreadImpl(PTP_WORK work)
+    WorkImpl::WorkImpl(PTP_WORK work)
         : work_{work}
     {
         // noop
     }
 
-    WorkThreadImpl::~WorkThreadImpl() = default;
+    WorkImpl::~WorkImpl() = default;
 
-    void WorkThreadImpl::submit()
+    void WorkImpl::submit()
     {
         SubmitThreadpoolWork(work_);
     }
@@ -98,7 +98,7 @@ namespace Eihire2::Inner {
         }
     }
 
-    WorkThreadImpl ThreadPoolImpl::createThread()
+    WorkImpl ThreadPoolImpl::createWorkThreadPool()
     {
         // TODO: ポインタのメモリ管理
         WorkCallback<void()> *wc = new WorkCallback<void()>{test};
@@ -108,7 +108,7 @@ namespace Eihire2::Inner {
         if (NULL == work) {
             throw std::runtime_error{"CreateThreadpoolWork failed. LastError: " + GetLastError()};
         }
-        return WorkThreadImpl{work};
+        return WorkImpl{work};
     }
 
 } //  namespace Eihire2::Inner

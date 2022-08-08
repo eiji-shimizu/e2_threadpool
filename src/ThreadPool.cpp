@@ -3,19 +3,19 @@
 namespace Eihire2 {
 
     /**
-     *  WorkThread
+     *  Work
      */
-    WorkThread::WorkThread(Inner::WorkThreadImpl workThreadImpl)
-        : workThreadImpl_{workThreadImpl}
+    Work::Work(Inner::WorkImpl workImpl)
+        : workImpl_{workImpl}
     {
         // noop
     }
 
-    WorkThread::~WorkThread() = default;
+    Work::~Work() = default;
 
-    void WorkThread::start()
+    void Work::start()
     {
-        workThreadImpl_.submit();
+        workImpl_.submit();
     }
 
     /**
@@ -24,9 +24,9 @@ namespace Eihire2 {
     ThreadPool::ThreadPool() = default;
     ThreadPool::~ThreadPool() = default;
 
-    WorkThread ThreadPool::addWorkThread()
+    Work ThreadPool::addWork()
     {
-        return WorkThread{threadPoolImpl_.createThread()};
+        return Work{threadPoolImpl_.createWorkThreadPool()};
     }
 
 } // namespace Eihire2

@@ -45,10 +45,10 @@ namespace Eihire2::Inner {
         std::function<R(ArgTypes...)> function_;
     };
 
-    class WorkThreadImpl {
+    class WorkImpl {
     public:
-        WorkThreadImpl(PTP_WORK work);
-        ~WorkThreadImpl();
+        WorkImpl(PTP_WORK work);
+        ~WorkImpl();
 
         void submit();
 
@@ -67,7 +67,7 @@ namespace Eihire2::Inner {
         ThreadPoolImpl(ThreadPoolImpl &&) = delete;
         ThreadPoolImpl &operator=(ThreadPoolImpl &&) = delete;
 
-        WorkThreadImpl createThread();
+        WorkImpl createWorkThreadPool();
 
     private:
         PTP_POOL pool_;
