@@ -1,15 +1,22 @@
+#include "ThreadPool.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
 
-using namespace std;
-
 int main()
 {
-    vector<string> msg{"Hello", "C++", "World", "from", "VS Code", "and the C++ extension!"};
-
-    for (const string &word : msg) {
-        cout << word << " ";
+    try {
+        Eihire2::ThreadPool threadPool;
+        Eihire2::WorkThread t1 = threadPool.addWorkThread();
+        t1.start();
+        threadPool.addWorkThread().start();
+        t1.start();
     }
-    cout << endl;
+    catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cout << "unexpected error." << std::endl;
+    }
 }

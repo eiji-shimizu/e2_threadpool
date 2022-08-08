@@ -1,5 +1,7 @@
 add_executable(e2_threadpool
-                Main.cpp)
+                Main.cpp
+                ThreadPool.cpp
+                ThreadPoolImpl.cpp)
 
 target_include_directories(e2_threadpool
                             PRIVATE ${E2_THREADPOOL_INCLUDE_DIRS})
