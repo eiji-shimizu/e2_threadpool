@@ -7,38 +7,6 @@
 
 namespace Eihire2::Inner {
 
-    //
-    // This is the thread pool work callback function.
-    //
-    VOID
-        CALLBACK
-        MyWorkCallback(
-            PTP_CALLBACK_INSTANCE Instance,
-            PVOID Parameter,
-            PTP_WORK Work)
-    {
-        // Instance, Parameter, and Work not used in this example.
-        UNREFERENCED_PARAMETER(Instance);
-        UNREFERENCED_PARAMETER(Parameter);
-        UNREFERENCED_PARAMETER(Work);
-
-        BOOL bRet = FALSE;
-
-        //
-        // Do something when the work callback is invoked.
-        //
-        {
-            std::cout << "MyWorkCallback: Task performed.\n";
-        }
-        std::cout << "OK.\n";
-        return;
-    }
-
-    void test()
-    {
-        std::cout << "test().\n";
-    }
-
     /**
      *  WorkImpl
      */
@@ -96,19 +64,6 @@ namespace Eihire2::Inner {
         catch (...) {
             // 何もできない
         }
-    }
-
-    WorkImpl ThreadPoolImpl::createWorkThreadPool()
-    {
-        // TODO: ポインタのメモリ管理
-        WorkCallback<void()> *wc = new WorkCallback<void()>{test};
-        PTP_WORK_CALLBACK workcallback = WorkCallback<void()>::wrapper;
-        PTP_WORK work = NULL;
-        work = CreateThreadpoolWork(workcallback, wc, &callBackEnviron_);
-        if (NULL == work) {
-            throw std::runtime_error{"CreateThreadpoolWork failed. LastError: " + GetLastError()};
-        }
-        return WorkImpl{work};
     }
 
 } //  namespace Eihire2::Inner

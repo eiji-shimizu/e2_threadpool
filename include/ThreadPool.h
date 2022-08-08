@@ -29,7 +29,11 @@ namespace Eihire2 {
         ThreadPool(ThreadPool &&) = delete;
         ThreadPool &operator=(ThreadPool &&) = delete;
 
-        Work addWork();
+        template <typename F, typename... ArgTypes>
+        Work addWork(F &&f, ArgTypes &&...args)
+        {
+            return Work{threadPoolImpl_.createWorkThreadPool(std::forward<F>(f), std::forward<ArgTypes>(args)...)};
+        }
 
     private:
         Inner::ThreadPoolImpl threadPoolImpl_;

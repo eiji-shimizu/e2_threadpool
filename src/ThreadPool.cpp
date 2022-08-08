@@ -24,9 +24,4 @@ namespace Eihire2 {
     ThreadPool::ThreadPool() = default;
     ThreadPool::~ThreadPool() = default;
 
-    Work ThreadPool::addWork()
-    {
-        return Work{threadPoolImpl_.createWorkThreadPool()};
-    }
-
 } // namespace Eihire2
