@@ -1,7 +1,9 @@
 #include "inner/ThreadPool_Win32.h"
 
+#include <any>
 #include <exception>
 #include <iostream>
+#include <vector>
 
 namespace Eihire2::Inner {
 
@@ -32,22 +34,30 @@ namespace Eihire2::Inner {
         return;
     }
 
+    void test()
+    {
+        std::cout << "test().\n";
+    }
+
+    /**
+     *  WorkThreadImpl
+     */
     WorkThreadImpl::WorkThreadImpl(PTP_WORK work)
         : work_{work}
     {
         // noop
     }
 
-    WorkThreadImpl::~WorkThreadImpl()
-    {
-        // noop
-    }
+    WorkThreadImpl::~WorkThreadImpl() = default;
 
     void WorkThreadImpl::submit()
     {
         SubmitThreadpoolWork(work_);
     }
 
+    /**
+     *  ThreadPoolImpl
+     */
     ThreadPoolImpl::ThreadPoolImpl()
         : pool_{NULL},
           cleanupgroup_{NULL}
@@ -90,9 +100,11 @@ namespace Eihire2::Inner {
 
     WorkThreadImpl ThreadPoolImpl::createThread()
     {
-        PTP_WORK_CALLBACK workcallback = MyWorkCallback;
+        // TODO: ポインタのメモリ管理
+        WorkCallback<void()> *wc = new WorkCallback<void()>{test};
+        PTP_WORK_CALLBACK workcallback = WorkCallback<void()>::wrapper;
         PTP_WORK work = NULL;
-        work = CreateThreadpoolWork(workcallback, NULL, &callBackEnviron_);
+        work = CreateThreadpoolWork(workcallback, wc, &callBackEnviron_);
         if (NULL == work) {
             throw std::runtime_error{"CreateThreadpoolWork failed. LastError: " + GetLastError()};
         }

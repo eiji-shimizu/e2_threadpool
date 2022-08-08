@@ -2,31 +2,27 @@
 
 namespace Eihire2 {
 
+    /**
+     *  WorkThread
+     */
     WorkThread::WorkThread(Inner::WorkThreadImpl workThreadImpl)
         : workThreadImpl_{workThreadImpl}
     {
         // noop
     }
 
-    WorkThread::~WorkThread()
-    {
-        // noop
-    }
+    WorkThread::~WorkThread() = default;
 
     void WorkThread::start()
     {
         workThreadImpl_.submit();
     }
 
-    ThreadPool::ThreadPool()
-    {
-        // noop
-    }
-
-    ThreadPool::~ThreadPool()
-    {
-        // noop
-    }
+    /**
+     *  ThreadPool
+     */
+    ThreadPool::ThreadPool() = default;
+    ThreadPool::~ThreadPool() = default;
 
     WorkThread ThreadPool::addWorkThread()
     {

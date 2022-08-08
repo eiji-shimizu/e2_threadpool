@@ -12,6 +12,9 @@ int main()
         t1.start();
         threadPool.addWorkThread().start();
         t1.start();
+        t1.start();
+        t1.start();
+        t1.start();
     }
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;
