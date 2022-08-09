@@ -20,7 +20,6 @@ namespace Eihire2::Inner {
     WorkImpl::~WorkImpl()
     {
         std::cout << "~WorkImpl()" << std::endl;
-        WaitForThreadpoolWorkCallbacks(work_, true);
     }
 
     void WorkImpl::submit()

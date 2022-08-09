@@ -11,6 +11,29 @@
 
 namespace Eihire2::Inner {
 
+    template <typename T = void>
+    struct WorkCallbackDeleter {
+
+        WorkCallbackDeleter(PTP_WORK work) noexcept : work_{work} {}
+
+        template <
+            typename U,
+            typename std::enable_if<std::is_convertible<U *, T *>::value, std::nullptr_t>::type = nullptr>
+        WorkCallbackDeleter(const WorkCallbackDeleter<U> &) noexcept {}
+
+        void operator()(T *ptr) const
+        {
+            std::cout << "delete 1" << std::endl;
+            WaitForThreadpoolWorkCallbacks(work_, true);
+            delete ptr;
+            CloseThreadpoolWork(work_);
+            std::cout << "delete 2" << std::endl;
+        }
+
+    private:
+        PTP_WORK work_;
+    };
+
     template <typename>
     class WorkCallback;
 
@@ -83,16 +106,21 @@ namespace Eihire2::Inner {
         template <typename F, typename... ArgTypes>
         WorkImpl createWorkThreadPool(F &&f, ArgTypes &&...args)
         {
-            auto *wc = new WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>{
-                std::forward<std::function<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>>(f),
-                std::forward<ArgTypes>(args)...};
+            std::unique_ptr<WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>> up{
+                new WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>{
+                    std::forward<std::function<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>>(f),
+                    std::forward<ArgTypes>(args)...}};
+
             PTP_WORK_CALLBACK callback = WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>::wrapper;
             PTP_WORK work = NULL;
-            work = CreateThreadpoolWork(callback, wc, &callBackEnviron_);
+            work = CreateThreadpoolWork(callback, up.get(), &callBackEnviron_);
             if (NULL == work) {
                 throw std::runtime_error{"CreateThreadpoolWork failed. LastError: " + GetLastError()};
             }
-            std::shared_ptr<void> p{wc};
+            std::shared_ptr<void> p{
+                up.get(),
+                WorkCallbackDeleter<WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>>{work}};
+            up.release();
             return WorkImpl{work, p};
         }
 
