@@ -4,6 +4,7 @@
 #include <windows.h>
 
 #include <functional>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -23,7 +24,11 @@ namespace Eihire2::Inner {
             // noop
         }
 
-        ~WorkCallback() = default;
+        // ~WorkCallback() = default;
+        ~WorkCallback()
+        {
+            std::cout << "~WorkCallback()" << std::endl;
+        }
 
         static VOID CALLBACK wrapper(PTP_CALLBACK_INSTANCE instance,
                                      PVOID parameter,
@@ -54,13 +59,14 @@ namespace Eihire2::Inner {
 
     class WorkImpl {
     public:
-        WorkImpl(PTP_WORK work);
+        WorkImpl(PTP_WORK work, std::shared_ptr<void> workCallbackPtr);
         ~WorkImpl();
 
         void submit();
 
     private:
         PTP_WORK work_;
+        std::shared_ptr<void> workCallbackPtr_;
     };
 
     class ThreadPoolImpl {
@@ -77,18 +83,17 @@ namespace Eihire2::Inner {
         template <typename F, typename... ArgTypes>
         WorkImpl createWorkThreadPool(F &&f, ArgTypes &&...args)
         {
-            // TODO: ポインタのメモリ管理
-            // int *wc = nullptr;
             auto *wc = new WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>{
                 std::forward<std::function<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>>(f),
                 std::forward<ArgTypes>(args)...};
-            PTP_WORK_CALLBACK workcallback = WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>::wrapper;
+            PTP_WORK_CALLBACK callback = WorkCallback<std::invoke_result_t<F, ArgTypes...>(ArgTypes...)>::wrapper;
             PTP_WORK work = NULL;
-            work = CreateThreadpoolWork(workcallback, wc, &callBackEnviron_);
+            work = CreateThreadpoolWork(callback, wc, &callBackEnviron_);
             if (NULL == work) {
                 throw std::runtime_error{"CreateThreadpoolWork failed. LastError: " + GetLastError()};
             }
-            return WorkImpl{work};
+            std::shared_ptr<void> p{wc};
+            return WorkImpl{work, p};
         }
 
     private:

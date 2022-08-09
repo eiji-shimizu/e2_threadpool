@@ -10,13 +10,18 @@ namespace Eihire2::Inner {
     /**
      *  WorkImpl
      */
-    WorkImpl::WorkImpl(PTP_WORK work)
-        : work_{work}
+    WorkImpl::WorkImpl(PTP_WORK work, std::shared_ptr<void> workCallbackPtr)
+        : work_{work},
+          workCallbackPtr_{workCallbackPtr}
     {
         // noop
     }
 
-    WorkImpl::~WorkImpl() = default;
+    WorkImpl::~WorkImpl()
+    {
+        std::cout << "~WorkImpl()" << std::endl;
+        WaitForThreadpoolWorkCallbacks(work_, true);
+    }
 
     void WorkImpl::submit()
     {
@@ -56,7 +61,7 @@ namespace Eihire2::Inner {
     {
         try {
             std::cout << "ThreadPoolImpl::~ThreadPoolImpl() BEFORE" << std::endl;
-            CloseThreadpoolCleanupGroupMembers(cleanupgroup_, FALSE, NULL);
+            CloseThreadpoolCleanupGroupMembers(cleanupgroup_, true, NULL);
             CloseThreadpoolCleanupGroup(cleanupgroup_);
             CloseThreadpool(pool_);
             std::cout << "ThreadPoolImpl::~ThreadPoolImpl() AFTER" << std::endl;
